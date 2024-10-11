@@ -2,16 +2,20 @@ package main
 
 import (
 	"bugbounty/backend/routes"
+	"fmt"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func main() {
+	godotenv.Load()
 	url := os.Getenv("CONNECTION_STRING")
+	fmt.Println(url)
 	db, err := gorm.Open(mysql.Open(url), &gorm.Config{})
 	if err != nil {
 		panic(err)
