@@ -19,7 +19,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/", func(res *gin.Context) {
 		res.JSON(http.StatusOK, gin.H{
-			"message": "Hello Bugghhhhhhhhhhhhhhhhhhhhhhhhy !!",
+			"message": "Hello Bugghhhhhhhhhhhhhhhhhhhy !!",
 		})
 	})
 	router.POST("/create-bug", func(ctx *gin.Context) {
