@@ -2,36 +2,36 @@ package main
 
 import (
 	"bugbounty/backend/routes"
-	"fmt"
-	"net/http"
+	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 func main() {
+	app := fiber.New()
+	app.Use(cors.New())
 	godotenv.Load()
 	url := os.Getenv("CONNECTION_STRING")
-	fmt.Println(url)
 	db, err := gorm.Open(mysql.Open(url), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	router := gin.Default()
-	router.GET("/", func(res *gin.Context) {
-		res.JSON(http.StatusOK, gin.H{
-			"message": "Hello dellllllllll !!",
-		})
+	app.Get("/", func(res *fiber.Ctx) error {
+		return res.JSON(fiber.Map{"hello": "gfij"})
 	})
-	router.POST("/create-bug", func(ctx *gin.Context) {
-		routes.CreateBug(ctx, db)
-	})
-	router.GET("/get-all-bugs", func(ctx *gin.Context) {
-		routes.GetAllRoutes(ctx, db)
-	})
-	router.Run(":3000")
 
+	app.Post("/api/create-bug", func(res *fiber.Ctx) error {
+		return routes.CreateBug(res, db)
+	})
+
+	app.Get("/api/get-all-bugs", func(res *fiber.Ctx) error {
+		return routes.GetAllRoutes(res, db)
+	})
+
+	log.Fatal(app.Listen(":3000"))
 }

@@ -1,16 +1,12 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-func GetAllRoutes(res *gin.Context, db *gorm.DB) {
-
+func GetAllRoutes(res *fiber.Ctx, db *gorm.DB) error {
 	var bugs []Bug
 	db.Find(&bugs)
-	res.JSON(200, bugs)
-	res.JSON(200, gin.H{
-		"message": "Hello Gin baby !!",
-	})
+	return res.Status(200).JSON(bugs)
 }

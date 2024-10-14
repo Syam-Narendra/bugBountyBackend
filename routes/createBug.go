@@ -1,10 +1,7 @@
 package routes
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
@@ -20,19 +17,12 @@ type Bug struct {
 	Name           string `json:"name"`
 }
 
-func CreateBug(res *gin.Context, db *gorm.DB) {
-
-	db.AutoMigrate(&Bug{})
+func CreateBug(res *fiber.Ctx, db *gorm.DB) error {
 	var data Bug
-
-	if err := res.ShouldBindJSON(&data); err != nil {
-		res.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
-		return
+	if err := res.BodyParser(&data); err != nil {
+		return res.JSON(fiber.Map{"error": "Failed to parse request body"})
 	}
 
-	fmt.Println(data.Rolename)
 	newBug := Bug{
 		Rolename:       data.Rolename,
 		BugTitle:       data.BugTitle,
@@ -43,15 +33,11 @@ func CreateBug(res *gin.Context, db *gorm.DB) {
 		Email:          data.Email,
 		Name:           data.Name,
 	}
+
 	result := db.Create(&newBug)
-	println(result)
 	if result.Error != nil {
-		res.JSON(http.StatusBadRequest, gin.H{
-			"error": result.Error,
-		})
+		return res.JSON(fiber.Map{"error": "Failed to create bug"})
 	}
 
-	res.JSON(http.StatusAccepted, gin.H{
-		"status": "Bug Created",
-	})
+	return res.Status(200).JSON(fiber.Map{"message": "Bug created successfully"})
 }
